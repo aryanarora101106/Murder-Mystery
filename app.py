@@ -3,7 +3,7 @@ from google import genai
 import os
 import json
 
-api_key = "AIzaSyAF0_D4EZVNFUQ8icwlOUNXvcd4WEiv5yE"
+api_key = "apikey"
 
 client = genai.Client(api_key=api_key)
 
