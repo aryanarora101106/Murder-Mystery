@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Murder Mystery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        async function interrogateSuspect() {
+            let suspect = document.getElementById("suspect").value;
+            let question = document.getElementById("question").value;
+            let responseBox = document.getElementById("response");
+
+            let response = await fetch("/interrogate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ suspect: suspect, question: question })
+            });
+
+            let data = await response.json();
+            responseBox.innerHTML = "<strong>" + suspect + ":</strong> " + data.response;
+        }
+
+        async function castVote() {
+            let suspect = document.getElementById("vote").value;
+            let resultBox = document.getElementById("result");
+
+            let response = await fetch("/vote", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ suspect: suspect })
+            });
+
+            let data = await response.json();
+            resultBox.innerHTML = "<strong>Result:</strong> " + data.result;
+        }
+    </script>
+</head>
+<body>
+    <h1>🔍 AI Murder Mystery Game</h1>
+
+    <h2>🕵️‍♂️ Case Details</h2>
+    <p><strong>Crime Scene:</strong> {{ mystery.crime_scene }}</p>
+    <p><strong>Victim:</strong> {{ mystery.victim }}</p>
+
+    <h3>🔎 Suspects:</h3>
+    <ul>
+        {% for suspect in mystery.suspects %}
+            <li><strong>{{ suspect.name }}</strong> - Motive: {{ suspect.motive }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>🧩 Clues:</h3>
+    <ul>
+        {% for clue in mystery.clues %}
+            <li>{{ clue }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>❓ Interrogate a Suspect</h2>
+    <select id="suspect">
+        {% for suspect in mystery.suspects %}
+            <option value="{{ suspect.name }}">{{ suspect.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="text" id="question" placeholder="Ask your question">
+    <button onclick="interrogateSuspect()">Ask</button>
+    <p id="response"></p>
+
+    <h2>⚖️ Who is the Murderer?</h2>
+    <select id="vote">
+        {% for suspect in mystery.suspects %}
+            <option value="{{ suspect.name }}">{{ suspect.name }}</option>
+        {% endfor %}
+    </select>
+    <button onclick="castVote()">Vote</button>
+    <p id="result"></p>
+</body>
+</html>
